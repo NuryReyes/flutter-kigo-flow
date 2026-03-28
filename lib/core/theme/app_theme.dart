@@ -4,7 +4,7 @@ class AppColors {
   AppColors._();
 
   // Brand
-  static const Color primary = Color(0xFFFF5C00);
+  static const Color primary = Color(0xFFFF5A00);
   static const Color primaryDark = Color(0xFFE04E00);
 
   // Accent
@@ -93,10 +93,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
