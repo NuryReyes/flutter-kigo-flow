@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kigo_app/shared/widgets/placeholder_screen.dart';
 import 'package:kigo_app/features/auth/screens/splash_screen.dart';
 import 'package:kigo_app/features/auth/screens/login_screen.dart';
 import 'package:kigo_app/features/auth/screens/otp_screen.dart';
+import 'package:kigo_app/features/home/screens/qr_screen.dart';
+import 'package:kigo_app/features/home/screens/stub_screens.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -16,26 +17,27 @@ final GoRouter appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/home/qr',
-          builder: (context, state) =>
-              const PlaceholderScreen(title: 'QR Home'),
+          builder: (context, state) => const QrScreen(),
         ),
         GoRoute(
           path: '/home/mapa',
-          builder: (context, state) => const PlaceholderScreen(title: 'Mapa'),
+          builder: (context, state) =>
+              const StubScreen(title: 'Mapa', icon: Icons.map_outlined),
         ),
         GoRoute(
           path: '/home/control',
           builder: (context, state) =>
-              const PlaceholderScreen(title: 'Control'),
+              const StubScreen(title: 'Control', icon: Icons.tune),
         ),
         GoRoute(
           path: '/home/servicios',
           builder: (context, state) =>
-              const PlaceholderScreen(title: 'Servicios'),
+              const StubScreen(title: 'Servicios', icon: Icons.grid_view),
         ),
         GoRoute(
           path: '/home/perfil',
-          builder: (context, state) => const PlaceholderScreen(title: 'Perfil'),
+          builder: (context, state) =>
+              const StubScreen(title: 'Perfil', icon: Icons.person_outline),
         ),
       ],
     ),
