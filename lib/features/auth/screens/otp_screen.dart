@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kigo_app/core/di/injection.dart';
 import 'package:kigo_app/features/auth/stores/otp_store.dart';
+import 'package:kigo_app/features/auth/repositories/auth_repository.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String phoneNumber;
+  const OtpScreen({super.key, required this.phoneNumber});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -17,7 +20,13 @@ class _OtpScreenState extends State<OtpScreen> {
     (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(5, (_) => FocusNode());
-  final OtpStore _otpStore = OtpStore();
+  late final OtpStore _otpStore;
+
+  @override
+  void initState() {
+    super.initState();
+    _otpStore = OtpStore(getIt<AuthRepository>(), widget.phoneNumber);
+  }
 
   @override
   void dispose() {
@@ -90,9 +99,9 @@ class _OtpScreenState extends State<OtpScreen> {
                         const SizedBox(height: 8),
 
                         // Phone number in green
-                        const Text(
-                          '555 - 564 - 9712',
-                          style: TextStyle(
+                        Text(
+                          widget.phoneNumber,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF4CAF50),
@@ -198,10 +207,11 @@ class _OtpScreenState extends State<OtpScreen> {
                               onPressed: _otpStore.canSubmit
                                   ? () async {
                                       await _otpStore.verifyOtp();
-                                      if (_otpStore.errorMessage == null &&
-                                          mounted) {
-                                        context.go('/home/qr');
+                                      if (_otpStore.errorMessage != null ||
+                                          !context.mounted) {
+                                        return;
                                       }
+                                      context.go('/home/qr');
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(

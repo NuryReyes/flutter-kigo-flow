@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kigo_app/features/auth/stores/auth_store.dart';
 import 'package:kigo_app/core/theme/app_theme.dart';
+import 'package:kigo_app/core/di/injection.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  final AuthStore _authStore = AuthStore();
+  final AuthStore _authStore = getIt<AuthStore>();
 
   @override
   void dispose() {
@@ -165,7 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                           !context.mounted) {
                                         return;
                                       }
-                                      context.go('/otp');
+                                      context.go(
+                                        '/otp',
+                                        extra: _authStore.phoneNumber,
+                                      );
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(

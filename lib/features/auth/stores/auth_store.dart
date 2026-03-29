@@ -1,10 +1,15 @@
 import 'package:mobx/mobx.dart';
+import 'package:kigo_app/features/auth/repositories/auth_repository.dart';
 
 part 'auth_store.g.dart';
 
 class AuthStore = AuthStoreBase with _$AuthStore;
 
 abstract class AuthStoreBase with Store {
+  final AuthRepository repository;
+
+  AuthStoreBase(this.repository);
+
   @observable
   String phoneNumber = '';
 
@@ -38,11 +43,9 @@ abstract class AuthStoreBase with Store {
     errorMessage = null;
 
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 2));
-      // TODO: call repository
+      await repository.requestOtp(phoneNumber);
     } catch (e) {
-      errorMessage = 'Ocurrió un error. Intenta de nuevo.';
+      errorMessage = 'Error al enviar el código. Intenta de nuevo.';
     } finally {
       isLoading = false;
     }

@@ -1,10 +1,16 @@
 import 'package:mobx/mobx.dart';
+import 'package:kigo_app/features/auth/repositories/auth_repository.dart';
 
 part 'otp_store.g.dart';
 
 class OtpStore = OtpStoreBase with _$OtpStore;
 
 abstract class OtpStoreBase with Store {
+  final AuthRepository repository;
+  final String phoneNumber;
+
+  OtpStoreBase(this.repository, this.phoneNumber);
+
   @observable
   ObservableList<String> digits = ObservableList.of(['', '', '', '', '']);
 
@@ -43,8 +49,11 @@ abstract class OtpStoreBase with Store {
     errorMessage = null;
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      // TODO: call repository
+      final success = await repository.verifyOtp(phoneNumber, otpCode);
+      if (!success) {
+        errorMessage = 'Código incorrecto. Intenta de nuevo.';
+        clearDigits();
+      }
     } catch (e) {
       errorMessage = 'Código incorrecto. Intenta de nuevo.';
       clearDigits();
@@ -59,8 +68,10 @@ abstract class OtpStoreBase with Store {
     errorMessage = null;
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      await repository.requestOtp(phoneNumber);
       clearDigits();
+    } catch (e) {
+      errorMessage = 'Error al reenviar el código.';
     } finally {
       isResending = false;
     }

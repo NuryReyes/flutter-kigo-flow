@@ -11,7 +11,13 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-    GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
+    GoRoute(
+      path: '/otp',
+      builder: (context, state) {
+        final phoneNumber = state.extra as String? ?? '';
+        return OtpScreen(phoneNumber: phoneNumber);
+      },
+    ),
     ShellRoute(
       builder: (context, state, child) => HomeShell(child: child),
       routes: [
