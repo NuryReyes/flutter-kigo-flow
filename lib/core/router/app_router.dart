@@ -3,16 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:kigo_app/shared/widgets/placeholder_screen.dart';
 import 'package:kigo_app/features/auth/screens/splash_screen.dart';
 import 'package:kigo_app/features/auth/screens/login_screen.dart';
+import 'package:kigo_app/features/auth/screens/otp_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-    GoRoute(
-      path: '/otp',
-      builder: (context, state) => const PlaceholderScreen(title: 'OTP'),
-    ),
+    GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
     ShellRoute(
       builder: (context, state, child) => HomeShell(child: child),
       routes: [

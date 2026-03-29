@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kigo_app/features/auth/stores/auth_store.dart';
 import 'package:kigo_app/core/theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,9 +14,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  bool _privacyAccepted = false;
-
-  bool get _canSubmit => _privacyAccepted && _phoneController.text.length == 10;
+  final AuthStore _authStore = AuthStore();
 
   @override
   void dispose() {
@@ -28,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Card
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
@@ -108,7 +108,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
-                                  onChanged: (_) => setState(() {}),
+                                  onChanged: (val) =>
+                                      _authStore.setPhoneNumber(val),
                                 ),
                               ),
                             ],
@@ -116,76 +117,111 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Privacy policy toggle
-                        Row(
-                          children: [
-                            Switch(
-                              value: _privacyAccepted,
-                              onChanged: (val) =>
-                                  setState(() => _privacyAccepted = val),
-                              activeThumbColor: AppColors.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: RichText(
-                                text: const TextSpan(
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.grey700,
-                                  ),
-                                  children: [
-                                    TextSpan(text: 'Acepto '),
-                                    TextSpan(
-                                      text:
-                                          'Política de privacidad, términos y condiciones',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                      ),
+                        // Privacy toggle
+                        Observer(
+                          builder: (_) => Row(
+                            children: [
+                              Switch(
+                                value: _authStore.privacyAccepted,
+                                onChanged: _authStore.togglePrivacy,
+                                activeThumbColor: AppColors.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: RichText(
+                                  text: const TextSpan(
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF555555),
                                     ),
-                                  ],
+                                    children: [
+                                      TextSpan(text: 'Acepto '),
+                                      TextSpan(
+                                        text:
+                                            'Política de privacidad, términos y condiciones',
+                                        style: TextStyle(
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 24),
 
-                        // CTA Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: _canSubmit
-                                ? () {
-                                    // TODO: navigate to OTP
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _canSubmit
-                                  ? const Color(0xFFFF6B00)
-                                  : const Color(0xFF999999),
-                              disabledBackgroundColor: const Color(0xFF999999),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  'Recibir código por SMS',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                        // CTA button
+                        Observer(
+                          builder: (_) => SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: _authStore.canSubmit
+                                  ? () async {
+                                      await _authStore.requestOtp();
+                                      if (_authStore.errorMessage != null ||
+                                          !context.mounted) {
+                                        return;
+                                      }
+                                      context.go('/otp');
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _authStore.canSubmit
+                                    ? const Color(0xFFFF6B00)
+                                    : const Color(0xFF999999),
+                                disabledBackgroundColor: const Color(
+                                  0xFF999999,
                                 ),
-                                SizedBox(width: 8),
-                                Icon(Icons.chevron_right, color: Colors.white),
-                              ],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: _authStore.isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Text(
+                                          'Recibir código por SMS',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 16),
+
+                        // Error message
+                        Observer(
+                          builder: (_) => _authStore.errorMessage != null
+                              ? Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Text(
+                                    _authStore.errorMessage!,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
 
                         // Help link
                         TextButton(
@@ -205,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-            // Footer outside card
+            // Footer
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Column(
