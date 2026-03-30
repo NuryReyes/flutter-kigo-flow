@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kigo_app/core/theme/app_theme.dart';
 import 'package:kigo_app/features/auth/screens/splash_screen.dart';
 import 'package:kigo_app/features/auth/screens/login_screen.dart';
 import 'package:kigo_app/features/auth/screens/otp_screen.dart';
@@ -71,8 +72,8 @@ class HomeShell extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFFF6B00),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.greyUnactive,
         onTap: (index) {
           switch (index) {
             case 0:

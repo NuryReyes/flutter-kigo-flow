@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -40,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       vertical: 32,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -63,33 +64,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1A1A1A),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.black,
                           ),
                         ),
                         const SizedBox(height: 24),
 
                         // Phone input
                         Container(
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Color(0xFFDDDDDD)),
-                            ),
-                          ),
+                          color: AppColors.white,
                           child: Row(
                             children: [
                               const Icon(
                                 Icons.phone_android,
-                                color: Color(0xFF999999),
+                                color: AppColors.greyUnactive,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
                               const Text(
                                 '+52',
                                 style: TextStyle(
-                                  color: Color(0xFFFF6B00),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
+                                  color: AppColors.lightBlue,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -101,9 +98,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: const InputDecoration(
                                     hintText: 'Teléfono celular',
                                     hintStyle: TextStyle(
-                                      color: Color(0xFF999999),
+                                      color: AppColors.greyUnactive,
                                     ),
                                     border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    filled: true,
+                                    fillColor: AppColors.white,
                                     counterText: '',
                                   ),
                                   inputFormatters: [
@@ -116,16 +120,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: AppColors.greyUnactive,
+                        ),
                         const SizedBox(height: 24),
 
                         // Privacy toggle
                         Observer(
                           builder: (_) => Row(
                             children: [
-                              Switch(
-                                value: _authStore.privacyAccepted,
-                                onChanged: _authStore.togglePrivacy,
-                                activeThumbColor: AppColors.primary,
+                              Transform.scale(
+                                scale: 0.72,
+                                alignment: Alignment.centerLeft,
+                                child: CupertinoSwitch(
+                                  value: _authStore.privacyAccepted,
+                                  onChanged: _authStore.togglePrivacy,
+                                  activeTrackColor: AppColors.primary,
+                                  inactiveTrackColor: AppColors.greyUnactive,
+                                  thumbColor: AppColors.white,
+                                ),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -133,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   text: const TextSpan(
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(0xFF555555),
+                                      color: AppColors.greyUnactive,
                                     ),
                                     children: [
                                       TextSpan(text: 'Acepto '),
@@ -174,18 +189,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _authStore.canSubmit
-                                    ? const Color(0xFFFF6B00)
-                                    : const Color(0xFF999999),
-                                disabledBackgroundColor: const Color(
-                                  0xFF999999,
-                                ),
+                                    ? AppColors.primary
+                                    : AppColors.greyUnactive,
+                                disabledBackgroundColor: AppColors.greyUnactive,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                               child: _authStore.isLoading
                                   ? const CircularProgressIndicator(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       strokeWidth: 2,
                                     )
                                   : Row(
@@ -195,14 +208,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                         Text(
                                           'Recibir código por SMS',
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         SizedBox(width: 8),
                                         Icon(
                                           Icons.chevron_right,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         ),
                                       ],
                                     ),
@@ -219,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Text(
                                     _authStore.errorMessage!,
                                     style: const TextStyle(
-                                      color: Colors.red,
+                                      color: AppColors.redAlert,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -233,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             '¿Necesitas ayuda?',
                             style: TextStyle(
-                              color: Color(0xFF555555),
+                              color: AppColors.blue,
                               fontSize: 13,
                             ),
                           ),
@@ -253,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text(
                     '¡Que nada te detenga!',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -263,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     '© 2023 Kigo - Parkimovil\nTodos los derechos reservados',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 12,
                       height: 1.6,
                     ),

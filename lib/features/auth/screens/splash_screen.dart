@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 '© 2023 Kigo - Parkimovil\nTodos los derechos reservados',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 12,
                   height: 1.6,
                 ),

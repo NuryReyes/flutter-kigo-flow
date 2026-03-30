@@ -16,7 +16,7 @@ class FakeHomeRepository implements HomeRepository {
     return const CardInfo(
       country: 'México',
       countryFlag: '🇲🇽',
-      balance: -128.00,
+      balance: 220.00,
       isActive: true,
     );
   }

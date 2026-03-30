@@ -3,8 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kigo_app/core/di/injection.dart';
+import 'package:kigo_app/core/theme/app_theme.dart';
 import 'package:kigo_app/features/auth/stores/otp_store.dart';
 import 'package:kigo_app/features/auth/repositories/auth_repository.dart';
+
+String _formatPhone10(String raw) {
+  final digits = raw.replaceAll(RegExp(r'\D'), '');
+  if (digits.length < 10) return raw;
+  final ten = digits.length > 10
+      ? digits.substring(digits.length - 10)
+      : digits;
+  return '${ten.substring(0, 3)} - ${ten.substring(3, 6)} - ${ten.substring(6, 10)}';
+}
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -56,7 +66,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFF6B00),
+      backgroundColor: AppColors.primary,
       body: SafeArea(
         child: Column(
           children: [
@@ -70,7 +80,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       vertical: 32,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -78,13 +88,14 @@ class _OtpScreenState extends State<OtpScreen> {
                       children: [
                         // Logo
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.45,
+                          width: 124,
                           child: Image.asset(
                             'assets/images/logo_kigo_orange.png',
                             fit: BoxFit.contain,
                           ),
                         ),
-                        const SizedBox(height: 24),
+
+                        const SizedBox(height: 34),
 
                         // Title
                         const Text(
@@ -93,18 +104,18 @@ class _OtpScreenState extends State<OtpScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1A1A1A),
+                            color: AppColors.black,
                           ),
                         ),
                         const SizedBox(height: 8),
 
                         // Phone number in green
                         Text(
-                          widget.phoneNumber,
+                          _formatPhone10(widget.phoneNumber),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF4CAF50),
+                            color: AppColors.green,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -114,8 +125,8 @@ class _OtpScreenState extends State<OtpScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(5, (index) {
                             return SizedBox(
-                              width: 60,
-                              height: 60,
+                              width: 52,
+                              height: 54,
                               child: TextField(
                                 controller: _controllers[index],
                                 focusNode: _focusNodes[index],
@@ -123,21 +134,21 @@ class _OtpScreenState extends State<OtpScreen> {
                                 maxLength: 1,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
                                 decoration: InputDecoration(
                                   counterText: '',
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFDDDDDD),
+                                      color: AppColors.greyUnactive,
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFFF6B00),
+                                      color: AppColors.primary,
                                       width: 2,
                                     ),
                                   ),
@@ -150,7 +161,6 @@ class _OtpScreenState extends State<OtpScreen> {
                             );
                           }),
                         ),
-                        const SizedBox(height: 24),
 
                         // Resend link
                         Observer(
@@ -167,20 +177,20 @@ class _OtpScreenState extends State<OtpScreen> {
                                     height: 16,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Color(0xFFFF6B00),
+                                      color: AppColors.primary,
                                     ),
                                   )
                                 : const Text(
                                     'Reenviar código',
                                     style: TextStyle(
-                                      color: Color(0xFFFF6B00),
+                                      color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                     ),
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 100),
 
                         // Error message
                         Observer(
@@ -190,7 +200,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   child: Text(
                                     _otpStore.errorMessage!,
                                     style: const TextStyle(
-                                      color: Colors.red,
+                                      color: AppColors.redAlert,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -216,18 +226,16 @@ class _OtpScreenState extends State<OtpScreen> {
                                   : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _otpStore.canSubmit
-                                    ? const Color(0xFF4CAF50)
-                                    : const Color(0xFF999999),
-                                disabledBackgroundColor: const Color(
-                                  0xFF999999,
-                                ),
+                                    ? AppColors.green
+                                    : AppColors.greyUnactive,
+                                disabledBackgroundColor: AppColors.greyUnactive,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                               child: _otpStore.isLoading
                                   ? const CircularProgressIndicator(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       strokeWidth: 2,
                                     )
                                   : Row(
@@ -237,7 +245,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                         Text(
                                           'Continuar',
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16,
                                           ),
@@ -245,7 +253,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                         SizedBox(width: 8),
                                         Icon(
                                           Icons.chevron_right,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         ),
                                       ],
                                     ),
@@ -260,7 +268,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: const Text(
                             '¿Necesitas ayuda?',
                             style: TextStyle(
-                              color: Color(0xFF555555),
+                              color: AppColors.greyUnactive,
                               fontSize: 13,
                             ),
                           ),
@@ -280,7 +288,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   const Text(
                     '¡Que nada te detenga!',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -290,7 +298,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     '© 2023 Kigo - Parkimovil\nTodos los derechos reservados',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 12,
                       height: 1.6,
                     ),

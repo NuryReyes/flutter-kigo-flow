@@ -10,15 +10,15 @@ class StubScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
         title: Text(
           title,
           style: const TextStyle(
-            color: Color(0xFF1A1A1A),
+            color: AppColors.black,
             fontWeight: FontWeight.w700,
             fontSize: 18,
           ),
@@ -38,7 +38,7 @@ class StubScreen extends StatelessWidget {
               'Próximamente',
               style: TextStyle(
                 fontSize: 16,
-                color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                color: AppColors.blackSubtle,
                 fontWeight: FontWeight.w500,
               ),
             ),

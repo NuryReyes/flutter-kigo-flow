@@ -5,6 +5,8 @@ import 'package:kigo_app/core/di/injection.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kigo_app/core/theme/app_theme.dart';
 
+const double _scannerCutoutSize = 220;
+
 class QrScreen extends StatefulWidget {
   const QrScreen({super.key});
 
@@ -38,7 +40,7 @@ class _QrScreenState extends State<QrScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('QR detectado: ${barcode!.rawValue}'),
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: AppColors.green,
         ),
       );
       // Reset after 3 seconds so user can scan again
@@ -51,7 +53,7 @@ class _QrScreenState extends State<QrScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.black,
       body: Column(
         children: [
           // Top app bar
@@ -67,7 +69,7 @@ class _QrScreenState extends State<QrScreen> {
                       const Icon(
                         Icons.notifications_outlined,
                         size: 28,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                       Positioned(
                         top: 0,
@@ -76,7 +78,7 @@ class _QrScreenState extends State<QrScreen> {
                           width: 8,
                           height: 8,
                           decoration: const BoxDecoration(
-                            color: Color(0xFFFF6B00),
+                            color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -84,22 +86,17 @@ class _QrScreenState extends State<QrScreen> {
                     ],
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.25,
+                    width: 133,
                     child: Image.asset(
                       'assets/images/logo_kigo_white.png',
                       fit: BoxFit.contain,
                     ),
                   ),
-                  Row(
-                    children: const [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 28,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 12),
-                      Icon(Icons.chat_outlined, size: 28, color: Colors.white),
-                    ],
+
+                  const Icon(
+                    Icons.chat_outlined,
+                    size: 28,
+                    color: AppColors.white,
                   ),
                 ],
               ),
@@ -109,333 +106,404 @@ class _QrScreenState extends State<QrScreen> {
           // Camera viewfinder area
           Expanded(
             flex: 5,
-            child: Stack(
-              children: [
-                // Live camera feed
-                MobileScanner(
-                  controller: _cameraController,
-                  onDetect: _onDetect,
-                ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final w = constraints.maxWidth;
+                final h = constraints.maxHeight;
+                final cutoutHalf = _scannerCutoutSize / 2;
+                final cutoutRight = w / 2 + cutoutHalf;
+                final cutoutTop = h / 2 - cutoutHalf;
 
-                // Dark overlay with cutout
-                CustomPaint(
-                  painter: _ScannerOverlayPainter(),
-                  child: const SizedBox.expand(),
-                ),
-
-                // Title
-                const Positioned(
-                  top: 24,
-                  left: 0,
-                  right: 0,
-                  child: Text(
-                    'Escanea el código QR',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Live camera feed
+                    MobileScanner(
+                      controller: _cameraController,
+                      onDetect: _onDetect,
                     ),
-                  ),
-                ),
 
-                // Flash toggle
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () => _cameraController.toggleTorch(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.flash_on,
-                        color: Colors.white,
-                        size: 22,
-                      ),
+                    // Dark overlay with cutout
+                    CustomPaint(
+                      painter: _ScannerOverlayPainter(),
+                      child: const SizedBox.expand(),
                     ),
-                  ),
-                ),
 
-                // Bottom buttons
-                Positioned(
-                  bottom: 24,
-                  left: 24,
-                  right: 24,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF6B00),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.qr_code_scanner,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Escanear QR',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
+                    // Title
+                    const Positioned(
+                      top: 24,
+                      left: 0,
+                      right: 0,
+                      child: Text(
+                        'Escanea el código QR',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFCC5500),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.qr_code,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Mostrar mi QR',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
+                    ),
+
+                    // Flash toggle
+                    Positioned(
+                      top: cutoutTop,
+                      right: w - cutoutRight,
+                      child: IconButton(
+                        onPressed: () => _cameraController.toggleTorch(),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: AppColors.white,
+                          padding: const EdgeInsets.all(8),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          minimumSize: const Size(44, 44),
                         ),
+                        icon: const Icon(Icons.flash_on, size: 22),
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+
+                    // Bottom buttons
+                    Positioned(
+                      bottom: 24,
+                      left: 24,
+                      right: 24,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.qr_code_scanner,
+                                color: AppColors.white,
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'Escanear QR',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.unactive,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.qr_code,
+                                color: AppColors.white,
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'Mostrar mi QR',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
 
           // Bottom info panel
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              children: [
-                // Country selector + active card row
-                Observer(
-                  builder: (_) {
-                    if (_homeStore.isLoading) {
-                      return const SizedBox(
-                        height: 48,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (_homeStore.errorMessage != null) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _homeStore.errorMessage!,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 12,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                children: [
+                  // Country selector + active card row
+                  Observer(
+                    builder: (_) {
+                      if (_homeStore.isLoading) {
+                        return const SizedBox(
+                          height: 48,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                              strokeWidth: 2,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _homeStore.loadCardInfo(),
-                            child: const Text(
-                              'Reintentar',
+                        );
+                      }
+
+                      if (_homeStore.errorMessage != null) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _homeStore.errorMessage!,
+                                style: const TextStyle(
+                                  color: AppColors.redAlert,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _homeStore.loadCardInfo(),
+                              child: const Text(
+                                'Reintentar',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      if (!_homeStore.hasData) {
+                        return const SizedBox(
+                          height: 48,
+                          child: Center(
+                            child: Text(
+                              'No hay tarjeta activa',
                               style: TextStyle(
-                                color: Color(0xFFFF6B00),
+                                color: AppColors.greyUnactive,
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final card = _homeStore.cardInfo!;
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Country selector
+                          Expanded(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            card.countryFlag,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 25,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 2),
+                                        const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 16,
+                                          color: AppColors.greyUnactive,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      'Cambiar país',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.greyUnactive,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+
+                          // Active / inactive card
+                          Expanded(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.credit_card,
+                                      size: 25,
+                                      color: card.isActive
+                                          ? AppColors.green
+                                          : AppColors.greyUnactive,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      card.isActive
+                                          ? 'Tarjeta activa'
+                                          : 'Tarjeta inactiva',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.greyUnactive,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+
+                          // Card balance
+                          Expanded(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.account_balance_wallet_outlined,
+                                      size: 25,
+                                      color: AppColors.greyUnactive,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '\$${card.balance.toStringAsFixed(2)}',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ],
                       );
-                    }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
 
-                    if (!_homeStore.hasData) {
-                      return const SizedBox(
-                        height: 48,
-                        child: Center(
-                          child: Text(
-                            'No hay tarjeta activa',
-                            style: TextStyle(
-                              color: Color(0xFF999999),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    final card = _homeStore.cardInfo!;
-                    return Row(
-                      children: [
-                        // Country selector
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFDDDDDD),
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  card.countryFlag,
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'Cambiar país',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF555555),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 16,
-                                  color: Color(0xFF555555),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Active card
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFDDDDDD),
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: const [
-                                    Icon(
-                                      Icons.credit_card,
-                                      size: 18,
-                                      color: Color(0xFF555555),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Tarjeta activa',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Color(0xFF555555),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  '-\$${card.balance.abs().toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFFFF6B00),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+          // Feature buttons
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 15,
+              left: 24,
+              right: 24,
+              bottom: 25,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.unactive,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      minimumSize: const Size(0, 40),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.location_on,
+                      color: AppColors.white,
+                      size: 18,
+                    ),
+                    label: const Text(
+                      'Parquímetro',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 12),
-
-                // Feature buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF6B00),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        label: const Text(
-                          'Parquímetro',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.unactive,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      minimumSize: const Size(0, 40),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF6B00),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.access_time,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        label: const Text(
-                          'Estatus',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
+                    icon: const Icon(
+                      Icons.access_time,
+                      color: AppColors.white,
+                      size: 18,
+                    ),
+                    label: const Text(
+                      'Estatus',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -450,7 +518,7 @@ class _QrScreenState extends State<QrScreen> {
 class _ScannerOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    const cutoutSize = 220.0;
+    final cutoutSize = _scannerCutoutSize;
     final cutoutRect = Rect.fromCenter(
       center: Offset(size.width / 2, size.height / 2),
       width: cutoutSize,
@@ -458,7 +526,8 @@ class _ScannerOverlayPainter extends CustomPainter {
     );
 
     // Dark overlay
-    final overlayPaint = Paint()..color = Colors.black.withValues(alpha: 0.6);
+    final overlayPaint = Paint()
+      ..color = AppColors.black.withValues(alpha: 0.6);
     final fullRect = Rect.fromLTWH(0, 0, size.width, size.height);
 
     // Draw overlay with hole
@@ -471,7 +540,7 @@ class _ScannerOverlayPainter extends CustomPainter {
 
     // Draw orange corner brackets
     final bracketPaint = Paint()
-      ..color = const Color(0xFFFF6B00)
+      ..color = AppColors.primary
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 
